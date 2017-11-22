@@ -1,0 +1,7 @@
+jet-iframe:not(.oj-complete){
+  visibility: hidden;
+}
+
+jet-iframe{
+
+}

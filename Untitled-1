@@ -1,0 +1,90 @@
+require(['knockout',
+  'ojs/ojcore',
+  'jquery',
+  'ojs/ojknockout',
+  'ojs/ojoption',
+  'ojs/ojmenu',
+  'ojs/ojbutton',
+  'ojs/ojselectcombobox'
+], function(ko, oj, $) {
+  'use strict';
+
+  var ViewModel = function() {
+    var self = this;
+    var modelSelect = document.getElementById('modelSelect');
+    
+		self.carModel = ko.observable();
+    self.carBrand = ko.observable();
+    self.carModels = ko.observableArray([]);
+    self.carBrands = [
+    {value: 'Honda', label: 'Honda'},
+    {value: 'Toyota', label: 'Toyota'},
+    {value: 'Ford', label: 'Ford'},
+    {value: 'Dodge', label: 'Dodge'},
+    {value: 'Chevrolet', label: 'Chevrolet'},
+    {value: 'Lexus', label: 'Lexus'}];
+    
+    self.brandChangeHandler = function(event){
+    	//only do this if we have actually selected something from the list
+      if(event.detail.trigger == 'option_selected'){
+      	//if we selected the placeholder, then reset the models and disable it
+        if (event.detail.value == ''){
+          self.carModels([]);
+          self.carModel('');
+          modelSelect.setProperty('disabled', true);
+          return;
+        };
+        // Using a free REST endpoint from National Highway Traffic Saftey Administration
+        var url ="//vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/"+
+        event.detail.value+
+        "/modelyear/2015/vehicletype/passenger_car?format=json";
+
+        $.getJSON(url).then(function(models) {
+          var tempArray = [];
+          $.each(models.Results, function() {
+          	// Push the data into a temp array and only update the observableArray one time to prevent chatty listeners
+            tempArray.push({'value': this.Model_Name, 'label': this.Model_Name});
+          });
+          self.carModels(tempArray);
+          if(event.detail.value){
+          	// enable the model select element now that it's populated
+            modelSelect.setProperty('disabled', false);
+          }
+        });
+      }
+    }
+  };
+  
+  ko.applyBindings(new ViewModel());
+});
+
+
+
+/*** CDN Setup ***/
+
+function _getCDNPath(paths) {
+    var cdnPath = "https://static.oracle.com/cdn/jet/";
+    var ojPath = "v4.0.0/default/js/";
+    var thirdpartyPath = "v4.0.0/3rdparty/";
+    var keys = Object.keys(paths);
+    var newPaths = {};
+    function _isoj(key) {
+        return (key.indexOf('oj') === 0 && key !== 'ojdnd');
+    }
+    keys.forEach(function(key) {
+        newPaths[key] = cdnPath + (_isoj(key) ? ojPath : thirdpartyPath) + paths[key];
+    });
+  console.log(JSON.stringify(newPaths))
+    return newPaths;
+}
+
+requirejs.config({
+    paths:   {'knockout':'https://static.oracle.com/cdn/jet/v4.0.0/3rdparty/knockout/knockout-3.4.0','jquery':'https://static.oracle.com/cdn/jet/v4.0.0/3rdparty/jquery/jquery-3.1.1.min','jqueryui-amd':'https://static.oracle.com/cdn/jet/v4.0.0/3rdparty/jquery/jqueryui-amd-1.12.0.min','promise':'https://static.oracle.com/cdn/jet/v4.0.0/3rdparty/es6-promise/es6-promise.min','ojs':'https://static.oracle.com/cdn/jet/v4.0.0/default/js/debug','ojL10n':'https://static.oracle.com/cdn/jet/v4.0.0/default/js/ojL10n','ojtranslations':'https://static.oracle.com/cdn/jet/v4.0.0/default/js/resources','signals':'https://static.oracle.com/cdn/jet/v4.0.0/3rdparty/js-signals/signals.min','text':'https://static.oracle.com/cdn/jet/v4.0.0/3rdparty/require/text','hammerjs':'https://static.oracle.com/cdn/jet/v4.0.0/3rdparty/hammer/hammer-2.0.8.min','ojdnd':'https://static.oracle.com/cdn/jet/v4.0.0/3rdparty/dnd-polyfill/dnd-polyfill-1.0.0.min','customElements':'https://static.oracle.com/cdn/jet/v4.0.0/3rdparty/webcomponents/custom-elements.min'}
+,
+  // Shim configurations for modules that do not expose AMD
+  shim: {
+    'jquery': {
+      exports: ['jQuery', '$']
+    }
+  }
+});

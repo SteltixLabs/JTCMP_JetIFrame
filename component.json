@@ -1,0 +1,28 @@
+{
+  "name": "jet-iframe",
+  "displayName": "jet-iframe",
+  "description": "Wrapper for iFrame",
+  "version": "1.0.0",
+  "jetVersion": "^4.0.0",
+  "properties": {
+
+  },
+  "methods": {
+
+  }, 
+  "events": {
+    "renderIframe": {
+      "description": "Triggered when the iFrame needs to be refreshed",
+      "bubbles": true,
+      "detail": {
+        "value": {
+          "description": "The new dom source to render",
+          "type": "string"
+        }
+      }
+    }
+    }, 
+  "slots": {
+
+  }
+}
