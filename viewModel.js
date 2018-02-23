@@ -13,17 +13,20 @@ define(
 
       self.source = ko.observable();
 
+        // listen for the renderIframe event
       self.addListener = function () {
         document.addEventListener('renderIframe', self.render);
       };
+        // method to redraw the iFrame
       self.render = function (e) {
-        console.log("data into render event === " + e.detail);
+        // console.log("data into render event === " + e.detail);
+        // prepare the code 
         const newCode = self.prepareSource(e.detail);
+        // get a hook to the iFrame in the view
         var iframe = document.querySelector('#output'),
           // Setup iFrame structure
         iframe_doc2 = iframe.contentDocument;
         // Write to iFrame
-        console.log(newCode)
         iframe_doc2.open();
         iframe_doc2.write(newCode);
         iframe_doc2.close();
@@ -56,11 +59,10 @@ define(
         // libs js
         var libsJS = '<script src="http://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js" type="text/javascript"></script>';
         src = src.replace('</head>', libsJS + '</head>');
-        // Javascript
-        
-        //console.log(src);
-        
+        // this is the data for the component
+        src = src.replace('</body>','<script>'+sourceCode.data+'</script>' + '</body>')
 
+        
         // return prepared src with textarea values inserted
         return src;
       }
